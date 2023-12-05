@@ -24,7 +24,8 @@ void initPlayer() {
     playerRect.h = player.size.y;
     player.direction.x = 0;
     player.direction.y = 0;
-    player.health = 100;
+    player.maxHealth = 100;
+    player.health = player.maxHealth;
 }
 
 void playerInput(const Uint8* keyboardState) {

@@ -14,7 +14,7 @@ struct Player {
     int mouseX;
     int mouseY;
     float reloadTime, currentReloadTimer;
-    int health;
+    int maxHealth, health;
 };
 
 typedef struct Player Player;

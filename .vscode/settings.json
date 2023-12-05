@@ -2,6 +2,8 @@
     "files.associations": {
         "vector.h": "c",
         "sdl.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "sdl_image.h": "c",
+        "texturemanager.h": "c"
     }
 }

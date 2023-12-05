@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <time.h>
 #include "headers/vector.h"
@@ -10,6 +11,11 @@
 #include "headers/player.h"
 #include "headers/enemy.h"
 #include "headers/collisions.h"
+#include "headers/textureManager.h"
+#include "headers/healthbar.h"
+#include "headers/score.h"
+#include "headers/gameState.h"
+#include "headers/button.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -24,18 +30,9 @@ void init() {
     SDL_CreateWindowAndRenderer(screenWidth, screenHeight, SDL_WINDOW_SHOWN, &screen, &renderer);
     SDL_SetWindowTitle(screen, WINDOW_TITLE);
     srand(time(NULL));
-    initPlayer();
-}
-
-void loadImage(SDL_Texture* texture, char* path) {
-    SDL_Surface* surface = IMG_Load(path);
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    printf(SDL_GetError());
-}
-
-SDL_Texture* createTexture(char* path) {
-    SDL_Surface* surface = IMG_Load(path);
-    return SDL_CreateTextureFromSurface(renderer, surface);
+    TTF_Init();
+    setupButtons(renderer);
+    setGameState(0);
 }
 
 void quit() {
@@ -44,9 +41,17 @@ void quit() {
     SDL_Quit();
 }
 
+void initGame() {
+    initPlayer();
+    setupHealthbar(renderer);
+    setupScore(renderer);
+    restartGame();
+}
+
 void restartGame() {
     destroyAllBullets();
     destroyAllEnemies();
+    resetScore();
     initPlayer();
 }
 
@@ -57,8 +62,14 @@ void gameLoop() {
     int numFrames = 0;
     int lastFrameStartTime;
 
-    SDL_Texture* playerSprite = createTexture("content/sprites/player1.png");
-    SDL_Texture* enemySprite = createTexture("content/sprites/enemy1.png");
+    SDL_Texture* playerSprite = createTexture("content/sprites/player1.png", renderer);
+    SDL_Texture* enemySprite = createTexture("content/sprites/enemy1.png", renderer);
+
+    Button startGameButton = createButton((Vector2){screenWidth/2.0-250, screenHeight/2.0-50}, (Vector2){500, 100}, "start", 0);
+    Button menuButton = createButton((Vector2){screenWidth/2.0-250, screenHeight/2.0+50}, (Vector2){500, 100}, "menu", 1);
+    Button unpauseButton = createButton((Vector2){screenWidth/2.0-250, screenHeight/2.0-150}, (Vector2){500, 100}, "back", 2);
+
+    int gameStarted = 0;
 
     float maxEnemySpawnTimeWait = 1;
     float currentEnemySpawnTimeWait = maxEnemySpawnTimeWait;
@@ -88,7 +99,7 @@ void gameLoop() {
                 case SDL_KEYDOWN:
                 {
                     if (event.key.repeat == 0) {
-
+                        
                     }
                 }
 			}
@@ -99,41 +110,75 @@ void gameLoop() {
         SDL_RenderClear(renderer);
 
         // game logic
-        updatePlayer();
-        playerInput(SDL_GetKeyboardState(NULL));
-        playerMouseInput();
-        movePlayer();
 
-        updateAllBullets();
-        updateEveryEnemy(getPlayer()->position);
+        // gamestate:
+        // 0 - main menu
+        // 1 - pause
+        // 2 - playing
+        if (getGameState() == 0) {
+            if (gameStarted == 1) {
+                gameStarted = 0;
+            }
+            updateButton(startGameButton);
+            drawButton(startGameButton, renderer);
+        }
+        if (getGameState() >= 1) {
+            if (gameStarted == 0) {
+                initGame();
+                currentEnemySpawnTimeWait = maxEnemySpawnTimeWait;
+                gameStarted = 1;
+            }
+            if (getGameState() == 2) {
+                updatePlayer();
+                playerInput(SDL_GetKeyboardState(NULL));
+                playerMouseInput();
+                movePlayer();
 
-        int b;
-        int e;
-        for (e = 0; e < getEnemyCount(); e++) {
-            if (getEnemyAt(e) != NULL) {
-                for (b = 0; b < getBulletCount(); b++) {
-                    if (getBulletAt(b) != NULL) checkBulletToEnemy(getBulletAt(b), getEnemyAt(e));
-                    else printf("AAAAAAAAAAAAAAA BULLET NULL ");
+                updateAllBullets();
+                updateEveryEnemy(getPlayer()->position);
+
+                updateHealthbar(getPlayer()->health, getPlayer()->maxHealth);
+
+                int b;
+                int e;
+                for (e = 0; e < getEnemyCount(); e++) {
+                        for (b = 0; b < getBulletCount(); b++) {
+                            checkBulletToEnemy(getBulletAt(b), getEnemyAt(e));
+                        }
+                        checkPlayerToEnemy(getPlayer(), getEnemyAt(e));
                 }
-                checkPlayerToEnemy(getPlayer(), getEnemyAt(e));
-            } else printf("AAAAAAAAAAAAAA ENEMY NULL ");
-        }
 
-        if (getPlayer() == NULL) printf("AAAAAAAAAAAAAA PLAYER NULL ");
+                if (getPlayer()->health <= 0) {
+                    restartGame();
+                }
+                
+                if (currentEnemySpawnTimeWait <= 0) {
+                    spawnEnemy();
+                    currentEnemySpawnTimeWait = maxEnemySpawnTimeWait;
+                }
+                currentEnemySpawnTimeWait -= deltaTime;
+            } 
 
-        if (getPlayer()->health <= 0) {
-            restartGame();
-        }
+            drawEveryEnemy(renderer, enemySprite);
+            drawPlayer(renderer, playerSprite);
+            drawAllBullets(renderer, playerSprite);
+            drawHealthbar(renderer);
+            drawHealthbarText(renderer);
+            drawScore(renderer);
+            
+            if (getGameState() == 1) {
+                updateButton(menuButton);
+                updateButton(unpauseButton);
+                drawButton(menuButton, renderer);
+                drawButton(unpauseButton, renderer);
+            }
 
-        drawEveryEnemy(renderer, enemySprite);
-        drawPlayer(renderer, playerSprite);
-        drawAllBullets(renderer, playerSprite);
-        
-        if (currentEnemySpawnTimeWait <= 0) {
-            spawnEnemy();
-            currentEnemySpawnTimeWait = maxEnemySpawnTimeWait;
+            if (getGameState() == 2) {
+                if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE]) {
+                    setGameState(1);
+                }
+            }
         }
-        currentEnemySpawnTimeWait -= deltaTime;
 
         // change the window title to show FPS
         char s[50];

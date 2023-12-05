@@ -1,0 +1,17 @@
+#ifndef TEXTUREMANAGER_H
+#define TEXTUREMANAGER_H
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+struct Text {
+    SDL_Texture* texture;
+    int w;
+    int h;
+};
+typedef struct Text Text;
+
+SDL_Texture* createTexture(char* path, SDL_Renderer* renderer);
+Text createText(TTF_Font* font, char* message, SDL_Color color, SDL_Renderer* renderer);
+
+#endif
