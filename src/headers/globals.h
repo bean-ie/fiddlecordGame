@@ -11,4 +11,11 @@ extern int TARGET_FPS;
 int random(int max);
 int randomMinMax(int min, int max);
 
+enum GameState {
+    Menu,
+    Paused,
+    Running,
+    CharacterSelection
+};
+
 #endif

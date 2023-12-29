@@ -8,15 +8,16 @@ struct Button {
     Vector2 size;
     char* text;
     int id;
+    int pressed;
 };
 
 typedef struct Button Button;
 
-void setupButtons(SDL_Renderer* renderer);
+void setupButtons();
 Button createButton(Vector2 position, Vector2 size, char* text, int id);
 
-void updateButton(Button button);
-void drawButton(Button button, SDL_Renderer* renderer);
+void updateButton(Button* button);
+void drawButton(Button button);
 
 void buttonClick(int id);
 

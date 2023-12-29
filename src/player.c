@@ -3,52 +3,102 @@
 #include "SDL2/SDL_image.h"
 #include "headers/globals.h"
 #include "headers/bullets.h"
+#include "headers/input.h"
 #include <stdio.h>
 
 Player player;
 
 SDL_Rect playerRect;
 
-void initPlayer() {
+void initPlayer(PlayerClass class) {
+    player.class = class;
     player.speed = 200.0;
     player.position.x = screenWidth/2 -50;
     player.position.y = screenHeight/2 -50;
-    player.size.x = 100;
-    player.size.y = 100;
+    player.velocity = (Vector2){0, 0};
+    player.acceleration = (Vector2){0, 0};
     player.rotation = 0;
-    player.reloadTime = 0.5;
     player.currentReloadTimer = 0;
     playerRect.x = player.position.x;
     playerRect.y = player.position.y;
-    playerRect.w = player.size.x;
-    playerRect.h = player.size.y;
+    playerRect.w = player.class.size.x;
+    playerRect.h = player.class.size.y;
     player.direction.x = 0;
     player.direction.y = 0;
-    player.maxHealth = 100;
-    player.health = player.maxHealth;
+    player.health = player.class.maxHealth;
 }
 
-void playerInput(const Uint8* keyboardState) {
-    player.direction = (Vector2){keyboardState[SDL_SCANCODE_D] - keyboardState[SDL_SCANCODE_A], keyboardState[SDL_SCANCODE_S] - keyboardState[SDL_SCANCODE_W]};
+void playerInput() {
+    //player.direction = (Vector2){getKey(SDL_SCANCODE_D) - getKey(SDL_SCANCODE_A), getKey(SDL_SCANCODE_S) - getKey(SDL_SCANCODE_W)};
+    Vector2 force = {0, 0};
+    force.x = (getKey(SDL_SCANCODE_D) - getKey(SDL_SCANCODE_A));
+    force.y = (getKey(SDL_SCANCODE_S) - getKey(SDL_SCANCODE_W));
+    force = normalizeVector(force);
+    force = multiplyVector(force, 300.0);
+    addForce(force);
 }
 
 void movePlayer() {
-    player.position.x += normalizeVector(player.direction).x * deltaTime * player.speed;
-    player.position.y += normalizeVector(player.direction).y * deltaTime * player.speed;
-    if (player.position.x > screenWidth - player.size.x) player.position.x = screenWidth - player.size.x;
-    if (player.position.x < 0) player.position.x = 0;
-    if (player.position.y > screenHeight - player.size.y) player.position.y = screenHeight - player.size.y;
-    if (player.position.y < 0) player.position.y = 0;
+    // Player movement, iteration 1
+    //player.position.x += normalizeVector(player.direction).x * deltaTime * player.speed * player.class.speedModifier;
+    //player.position.y += normalizeVector(player.direction).y * deltaTime * player.speed * player.class.speedModifier;
+
+    // Player movement, iteration 2
+    ///*
+    player.velocity = addVectors(player.velocity, multiplyVector(player.acceleration, deltaTime));
+    player.position.x += player.velocity.x * deltaTime;
+    player.position.y += player.velocity.y * deltaTime;
+    player.velocity = multiplyVector(player.velocity, 0.9);
+    player.acceleration = multiplyVector(player.acceleration, 0.9);
+    //*/
+
+    // Player movement, iteration 3
+    /*
+    addForce(multiplyVector(normalizeVector(player.velocity), -0.6 * 1000));
+    player.acceleration = divideVector(player.allForces, player.mass);
+    player.velocity = addVectors(player.velocity, multiplyVector(player.acceleration, deltaTime));
+    player.position.x += player.velocity.x * deltaTime * player.class.speedModifier;
+    player.position.y += player.velocity.y * deltaTime * player.class.speedModifier;
+    player.allForces = (Vector2){0, 0}; 
+    */
+
+    // screen clamping
+    if (player.position.x > screenWidth - player.class.size.x) { 
+        player.position.x = screenWidth - player.class.size.x;
+        player.velocity.x = 0;
+    }
+    if (player.position.x < 0) { 
+        player.position.x = 0;
+        player.velocity.x = 0;
+    }
+    if (player.position.y > screenHeight - player.class.size.y) {
+        player.position.y = screenHeight - player.class.size.y;
+        player.velocity.y = 0;
+    }
+    if (player.position.y < 0) {
+        player.position.y = 0;
+        player.velocity.y = 0;
+    }
+}
+
+void addForce(Vector2 force) { 
+    player.acceleration = addVectors(player.acceleration, divideVector(force, player.class.mass));
+    //player.allForces = addVectors(player.allForces, force);
 }
 
 void playerMouseInput() {
-    Uint32 mouseState = SDL_GetMouseState(&player.mouseX, &player.mouseY);
-    if (mouseState == SDL_BUTTON(1) && player.currentReloadTimer <= 0) {
+    if (getMouseButton(1) && player.currentReloadTimer <= 0) {
         Vector2 mousePosition;
-        mousePosition.x = player.mouseX;
-        mousePosition.y = player.mouseY;
-        createBullet(addVectors(player.position, (Vector2){50, 50}), mousePosition);
-        player.currentReloadTimer = player.reloadTime;
+        mousePosition.x = getMousePosition().x;
+        mousePosition.y = getMousePosition().y;
+        float angle;
+        int i;
+        for (i = 0; i < player.class.bulletsPerShot; i++) {
+            angle = randomMinMax(-player.class.bulletSpreadAngle/2, player.class.bulletSpreadAngle/2);
+            createBullet(addVectors(player.position, (Vector2){50, 50}), rotateVector(normalizeVector(subtractVectors(mousePosition, addVectors(player.position, multiplyVector(player.class.size, 0.5)))), angle));
+        }
+        addForce(multiplyVector(normalizeVector(subtractVectors(getMousePosition(), addVectors(player.position, divideVector(player.class.size, 2)))), -player.class.shotKnockbackForce));
+        player.currentReloadTimer = player.class.reloadTime;
     }
 }
 
@@ -60,12 +110,10 @@ void updatePlayer() {
     if (player.rotation > 360) player.rotation -= 360;
 }
 
-void drawPlayer(SDL_Renderer* renderer, SDL_Texture* sprite) {
+void drawPlayer() {
     playerRect.x = player.position.x;
     playerRect.y = player.position.y; 
-    if (SDL_RenderCopyEx(renderer, sprite, NULL, &playerRect, player.rotation, NULL, SDL_FLIP_NONE)!= 0) {
-        printf(SDL_GetError());
-    } // draw player   
+    render(player.class.sprite, &playerRect);
 }
 
 Player* getPlayer() {

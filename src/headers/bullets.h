@@ -15,14 +15,16 @@ struct Bullet {
 
 typedef struct Bullet Bullet;
 
+void setupBullets();
+
 Bullet* getBulletAt(int index);
 int getBulletCount();
 
-void createBullet(Vector2 spawnPosition, Vector2 mousePosition);
+void createBullet(Vector2 spawnPosition, Vector2 direction);
 void destroyBullet(int bulletIndex);
 void destroyAllBullets();
 
 void updateAllBullets();
-void drawAllBullets(SDL_Renderer* renderer, SDL_Texture* sprite);
+void drawAllBullets();
 
 #endif

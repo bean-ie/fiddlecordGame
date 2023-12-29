@@ -1,21 +1,29 @@
 #include "headers/bullets.h"
 #include "headers/globals.h"
+#include "headers/textureManager.h"
+#include "headers/player.h"
+#include "headers/playerClass.h"
 
 Bullet bullets[100];
 int bulletCount = 0;
 
-void createBullet(Vector2 spawnPosition, Vector2 mousePosition) {
+SDL_Texture* bulletSprite;
+
+void setupBullets() {
+    bulletSprite = createTexture("content/sprites/player1.png");
+}
+
+void createBullet(Vector2 spawnPosition, Vector2 direction) {
     if (bulletCount > 99) {
-            destroyBullet(0);
+            destroyBullet(99);
         }
-    Vector2 direction = subtractVectors(mousePosition, spawnPosition);
     Bullet bulletToSpawn;
     bulletToSpawn.position.x = spawnPosition.x - 25;
     bulletToSpawn.position.y = spawnPosition.y - 25;
     bulletToSpawn.lifeTime = 2;
-    bulletToSpawn.damage = 150;
-    bulletToSpawn.speed = 600;
-    bulletToSpawn.direction = direction;
+    bulletToSpawn.damage = getPlayer()->class.damage;
+    bulletToSpawn.speed = randomMinMax(500, 700);
+    bulletToSpawn.direction = normalizeVector(direction);
     bullets[bulletCount] = bulletToSpawn;
     bulletCount++;
 }
@@ -36,19 +44,21 @@ void updateAllBullets() {
     int i;
         for (i = 0; i < bulletCount; i++) {
             if (bullets[i].damage <= 0 || bullets[i].lifeTime <= 0) destroyBullet(i);
-            bullets[i].position = addVectors(bullets[i].position, multiplyVector(multiplyVector(normalizeVector(bullets[i].direction), deltaTime), bullets[i].speed));
+            bullets[i].position = addVectors(bullets[i].position, multiplyVector(multiplyVector(bullets[i].direction, deltaTime), bullets[i].speed));
             bullets[i].lifeTime -= deltaTime;
         }
 }
 
-void drawAllBullets(SDL_Renderer* renderer, SDL_Texture* sprite) {  
-    SDL_Rect bulletToDrawRect = {0, 0, 50, 50};
+void drawAllBullets() {  
+    SDL_Rect bulletToDrawRect;
     int i;
     for (i = 0; i < bulletCount; i++) {
         bulletToDrawRect.x = bullets[i].position.x;
         bulletToDrawRect.y = bullets[i].position.y;
-        SDL_RenderCopy(renderer, sprite, NULL, &bulletToDrawRect);
-    }    
+        bulletToDrawRect.w = 50;
+        bulletToDrawRect.h = 50;
+        render(bulletSprite, &bulletToDrawRect);
+    }
 }
 
 Bullet* getBulletAt(int index) {

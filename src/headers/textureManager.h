@@ -11,7 +11,10 @@ struct Text {
 };
 typedef struct Text Text;
 
-SDL_Texture* createTexture(char* path, SDL_Renderer* renderer);
-Text createText(TTF_Font* font, char* message, SDL_Color color, SDL_Renderer* renderer);
+void setupTextures(SDL_Renderer* _renderer);
+SDL_Texture* createTexture(char* path);
+Text createText(TTF_Font* font, char* message, SDL_Color color);
+
+void render(SDL_Texture* texture, SDL_Rect* rect);
 
 #endif

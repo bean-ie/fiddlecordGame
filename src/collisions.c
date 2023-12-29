@@ -28,7 +28,7 @@ void checkBulletToEnemy(Bullet* bullet, Enemy* enemy) {
 
 void checkPlayerToEnemy(Player* player, Enemy* enemy) {
     if (sqrMagnitude(subtractVectors(enemy->position, player->position)) <= 300*300) {
-        if (collides(player->position, player->size, enemy->position, enemy->size)) {
+        if (collides(player->position, player->class.size, enemy->position, enemy->size)) {
             player->health -= enemy->damage;
             enemy->health = 0;
         }

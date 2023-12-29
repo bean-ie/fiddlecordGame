@@ -10,9 +10,9 @@ SDL_Texture* scoreBackSprite;
 TTF_Font* scoreFont;
 SDL_Color scoreTextColor;
 
-void setupScore(SDL_Renderer* renderer) {
+void setupScore() {
     score = 0;
-    scoreBackSprite = createTexture("content/sprites/scoreBack.png", renderer);
+    scoreBackSprite = createTexture("content/sprites/scoreBack.png");
     scoreFont = TTF_OpenFont("content/fonts/Square.ttf", 48);
     scoreTextColor.r = 255;
     scoreTextColor.g = 255;
@@ -30,7 +30,7 @@ void resetScore() {
 void drawScore(SDL_Renderer* renderer) {
     char* message[6];
     sprintf(message, "%i", score);
-    Text text = createText(scoreFont, message, scoreTextColor, renderer);
+    Text text = createText(scoreFont, message, scoreTextColor);
     scoreTextRect.x = screenWidth/2 - text.w/2;
     scoreTextRect.y = 45;
     scoreTextRect.w = text.w;
@@ -39,6 +39,7 @@ void drawScore(SDL_Renderer* renderer) {
     scoreBackRect.h = text.h + 20;
     scoreBackRect.x = scoreTextRect.x - 25;
     scoreBackRect.y = scoreTextRect.y - 10;
-    SDL_RenderCopy(renderer, scoreBackSprite, NULL, &scoreBackRect);
-    SDL_RenderCopy(renderer, text.texture, NULL, &scoreTextRect);
+    render(scoreBackSprite, &scoreBackRect);
+    render(text.texture, &scoreTextRect);
+    SDL_DestroyTexture(text.texture);
 }

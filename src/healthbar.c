@@ -10,7 +10,7 @@ TTF_Font* font;
 SDL_Color textColor;
 int maxHealth, health;
 
-void setupHealthbar(SDL_Renderer* renderer) {
+void setupHealthbar() {
     healthbarRect.x = 50;
     healthbarRect.y = 50;
     healthbarRect.w = 300;
@@ -19,8 +19,8 @@ void setupHealthbar(SDL_Renderer* renderer) {
     backRect.y = 35;
     backRect.w = 330;
     backRect.h = 90;
-    healthbarSprite = createTexture("content/sprites/healthbar.png", renderer);
-    backSprite = createTexture("content/sprites/healthbarBack.png", renderer);
+    healthbarSprite = createTexture("content/sprites/healthbar.png");
+    backSprite = createTexture("content/sprites/healthbarBack.png");
     font = TTF_OpenFont("content/fonts/Square.ttf", 48);
     textColor.r = 255;
     textColor.g = 255;
@@ -32,19 +32,20 @@ void updateHealthbar(int _health, int _maxHealth) {
     maxHealth = _maxHealth;
 }
 
-void drawHealthbar(SDL_Renderer* renderer) {
+void drawHealthbar() {
     healthbarRect.w = 300.0 * (float)health/maxHealth;
-    SDL_RenderCopy(renderer, backSprite, NULL, &backRect);
-    SDL_RenderCopy(renderer, healthbarSprite, NULL, &healthbarRect);
+    render(backSprite, &backRect);
+    render(healthbarSprite, &healthbarRect);
 }
 
-void drawHealthbarText(SDL_Renderer* renderer) {
+void drawHealthbarText() {
     char* message[10];
     sprintf(message, "%i/%i", health, maxHealth);
-    Text text = createText(font, message, textColor, renderer);
+    Text text = createText(font, message, textColor);
     textRect.x = 200 - text.w/2;
     textRect.y = 80 - text.h/2;
     textRect.w = text.w;
     textRect.h = text.h;
-    SDL_RenderCopy(renderer, text.texture, NULL, &textRect);
+    render(text.texture, &textRect);
+    SDL_DestroyTexture(text.texture);
 }

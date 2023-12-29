@@ -30,3 +30,11 @@ Vector2 multiplyVector(Vector2 v, float scalar) {
 Vector2 divideVector(Vector2 v, float scalar) {
     return (Vector2){v.x/scalar, v.y/scalar};
 }
+
+Vector2 rotateVector(Vector2 v, float angle) {
+    float radAngle = angle * 3.1415926/180.0;
+    Vector2 result;
+    result.x = v.x * cos(radAngle) - v.y * sin(radAngle);
+    result.y = v.x * sin(radAngle) + v.y * cos(radAngle);
+    return result;
+}

@@ -14,9 +14,11 @@ struct Enemy {
 };
 typedef struct Enemy Enemy;
 
+void setupEnemies();
+
 void spawnEnemy();
 void updateEveryEnemy(Vector2 playerPosition);
-void drawEveryEnemy(SDL_Renderer* renderer, SDL_Texture* sprite);
+void drawEveryEnemy();
 
 void destroyEnemy(int enemyIndex);
 void destroyAllEnemies();

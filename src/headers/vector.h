@@ -15,5 +15,6 @@ double sqrMagnitude(Vector2 v);
 Vector2 normalizeVector(Vector2 v);
 Vector2 multiplyVector(Vector2 v, float scalar);
 Vector2 divideVector(Vector2 v, float scalar);
+Vector2 rotateVector(Vector2 v, float angle);
 
 #endif

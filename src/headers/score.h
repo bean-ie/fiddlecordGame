@@ -3,11 +3,11 @@
 
 typedef struct SDL_Renderer SDL_Renderer;
 
-void setupScore(SDL_Renderer* renderer);
+void setupScore();
 
 void addScore(int amount);
 void resetScore();
 
-void drawScore(SDL_Renderer* renderer);
+void drawScore();
 
 #endif

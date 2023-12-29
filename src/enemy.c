@@ -1,9 +1,18 @@
 #include "headers/enemy.h"
 #include "math.h"
 #include "headers/globals.h"
+#include "headers/textureManager.h"
 
 Enemy enemies[100];
 int enemyCount = 0;
+
+SDL_Texture* enemySprite;
+SDL_Texture* enemyCloseDeadSprite;
+
+void setupEnemies() {
+    enemySprite = createTexture("content/sprites/enemy1.png");
+    enemyCloseDeadSprite = createTexture("content/sprites/enemy2.png");
+}
 
 void spawnEnemy() {
     if (enemyCount > 99) {
@@ -34,7 +43,7 @@ void updateEveryEnemy(Vector2 playerPosition) {
     }
 }
 
-void drawEveryEnemy(SDL_Renderer* renderer, SDL_Texture* sprite) {
+void drawEveryEnemy() {
     int i;
     for (i = 0; i < enemyCount; i++) {
         SDL_Rect enemyRect;
@@ -42,7 +51,13 @@ void drawEveryEnemy(SDL_Renderer* renderer, SDL_Texture* sprite) {
         enemyRect.y = (int)enemies[i].position.y;
         enemyRect.w = (int)enemies[i].size.x;
         enemyRect.h = (int)enemies[i].size.y;
-        SDL_RenderCopy(renderer, sprite, NULL, &enemyRect);
+        SDL_Texture* spriteToUse;
+        if (enemies[i].health <= enemies[i].maxHealth * 0.5) {
+            spriteToUse = enemyCloseDeadSprite;
+        } else {
+            spriteToUse = enemySprite;
+        }
+        render(spriteToUse, &enemyRect);
     }
 }
 
