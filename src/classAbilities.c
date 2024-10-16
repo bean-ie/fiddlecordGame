@@ -38,6 +38,7 @@ int onShootAbility() {
     switch (getPlayer()->class.id) {
 
         case 2:
+            return 1;
             Vector2 playerPos = {};
             playerPos.x = getPlayer()->position.x + getPlayer()->class.size.x/2.0;
             playerPos.y = getPlayer()->position.y + getPlayer()->class.size.y/2.0;
