@@ -15,6 +15,7 @@ int collides(Vector2 firstPos, Vector2 firstSize, Vector2 secondPos, Vector2 sec
 }
 
 void checkBulletToEnemy(Bullet* bullet, Enemy* enemy) {
+    if (bullet->active == 0) return;
     if (sqrMagnitude(subtractVectors(enemy->position, bullet->position)) <= 300*300) {
         if (collides(bullet->position, (Vector2){50, 50}, enemy->position, enemy->size)) {
             int damageDealt = enemy->health;

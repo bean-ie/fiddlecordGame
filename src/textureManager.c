@@ -33,3 +33,9 @@ void render(SDL_Texture* texture, SDL_Rect* rect) {
         printf(SDL_GetError());
     }
 }
+
+void renderEx(SDL_Texture* texture, SDL_Rect* rect, double angle, SDL_Point* center) {
+    if (SDL_RenderCopyEx(renderer, texture, NULL, rect, angle, center, SDL_FLIP_NONE) != 0) {
+        printf(SDL_GetError());
+    }
+}

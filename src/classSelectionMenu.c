@@ -18,8 +18,10 @@ void createClasses() {
     PlayerClass class;
 
     class.name = "Beanie";
+    class.id = 0;
     class.bulletsPerShot = 1;
     class.bulletSpreadAngle = 5;
+    class.bulletLifetime = 2;
     class.damage = 100;
     class.reloadTime = 0.35;
     class.mass = 1;
@@ -32,8 +34,10 @@ void createClasses() {
     nameTexts[0] = createText(nameFont, class.name, nameTextColor);
 
     class.name = "Fapas";
+    class.id = 1;
     class.bulletsPerShot = 10;
     class.bulletSpreadAngle = 20;
+    class.bulletLifetime = 2;
     class.damage = 25;
     class.reloadTime = 0.7;
     class.mass = 0.6;
@@ -46,26 +50,30 @@ void createClasses() {
     nameTexts[1] = createText(nameFont, class.name, nameTextColor);
 
     class.name = "Esmile";
+    class.id = 2;
     class.bulletsPerShot = 1;
     class.bulletSpreadAngle = 5;
+    class.bulletLifetime = 2;
     class.damage = 400;
     class.reloadTime = 1.25;
     class.mass = 2;
     class.maxHealth = 250;
     class.shotKnockbackForce = 7500;
-    class.size = (Vector2){125, 125};
+    class.size = (Vector2){150, 150};
     class.sprite = createTexture("content/sprites/characters/esmile.png");
     classes[2] = class;
     buttons[2] = createButton((Vector2){250 + (400 * (2 % 4)), 175 + (300 * 0)}, (Vector2){150, 60}, "play", 12);
     nameTexts[2] = createText(nameFont, class.name, nameTextColor);
 
     class.name = "Fortuna";
+    class.id = 3;
     class.bulletsPerShot = 2;
-    class.bulletSpreadAngle = 20;
+    class.bulletSpreadAngle = 10;
+    class.bulletLifetime = 2;
     class.damage = 60;
     class.reloadTime = 0.5;
     class.mass = 0.85;
-    class.maxHealth = 175;
+    class.maxHealth = 80;
     class.shotKnockbackForce = 500;
     class.size = (Vector2){85, 85};
     class.sprite = createTexture("content/sprites/characters/fortuna.png");
@@ -74,12 +82,14 @@ void createClasses() {
     nameTexts[3] = createText(nameFont, class.name, nameTextColor);
 
     class.name = "Ryorthios";
+    class.id = 4;
     class.bulletsPerShot = 1;
-    class.bulletSpreadAngle = 25;
-    class.damage = 14;
-    class.reloadTime = 0.05;
+    class.bulletSpreadAngle = 5;
+    class.bulletLifetime = 0.8;
+    class.damage = 50;
+    class.reloadTime = 0.1;
     class.mass = 1;
-    class.maxHealth = 85;
+    class.maxHealth = 100;
     class.shotKnockbackForce = 100;
     class.size = (Vector2){100, 100};
     class.sprite = createTexture("content/sprites/characters/ryan.png");

@@ -27,6 +27,10 @@ void resetScore() {
     score = 0;
 }
 
+int getScore() {
+    return score;
+}
+
 void drawScore(SDL_Renderer* renderer) {
     char* message[6];
     sprintf(message, "%i", score);

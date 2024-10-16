@@ -11,6 +11,7 @@ struct Bullet {
     float speed;
     int damage;
     float lifeTime;
+    int active;
 };
 
 typedef struct Bullet Bullet;

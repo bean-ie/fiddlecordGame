@@ -7,6 +7,7 @@ void setupScore();
 
 void addScore(int amount);
 void resetScore();
+int getScore();
 
 void drawScore();
 

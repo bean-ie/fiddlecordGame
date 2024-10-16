@@ -37,6 +37,7 @@ void initGame() {
     setupScore();
     setupBullets();
     setupEnemies();
+    setupClassAbilities();
     restartGame();
 }
 
@@ -182,6 +183,7 @@ void updateEverything() {
     }
 
     if (getPlayer()->health <= 0) {
+        if (getPlayer()->class.id == 4) ryanReplenishAmmo(1);
         restartGame();
     }
     

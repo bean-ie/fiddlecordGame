@@ -4,6 +4,7 @@
 #include "headers/globals.h"
 #include "headers/bullets.h"
 #include "headers/input.h"
+#include "headers/classAbilities.h"
 #include <stdio.h>
 
 Player player;
@@ -88,6 +89,8 @@ void addForce(Vector2 force) {
 
 void playerMouseInput() {
     if (getMouseButton(1) && player.currentReloadTimer <= 0) {
+        player.currentReloadTimer = player.class.reloadTime;
+        if (onShootAbility() == 0) return;
         Vector2 mousePosition;
         mousePosition.x = getMousePosition().x;
         mousePosition.y = getMousePosition().y;
@@ -98,7 +101,6 @@ void playerMouseInput() {
             createBullet(addVectors(player.position, (Vector2){50, 50}), rotateVector(normalizeVector(subtractVectors(mousePosition, addVectors(player.position, multiplyVector(player.class.size, 0.5)))), angle));
         }
         addForce(multiplyVector(normalizeVector(subtractVectors(getMousePosition(), addVectors(player.position, divideVector(player.class.size, 2)))), -player.class.shotKnockbackForce));
-        player.currentReloadTimer = player.class.reloadTime;
     }
 }
 
@@ -106,8 +108,9 @@ void updatePlayer() {
     if (player.currentReloadTimer > 0) {
         player.currentReloadTimer -= deltaTime;
     }
-    player.rotation++;
-    if (player.rotation > 360) player.rotation -= 360;
+    //player.rotation++;
+    //if (player.rotation > 360) player.rotation -= 360;
+    abilityLoop();
 }
 
 void drawPlayer() {

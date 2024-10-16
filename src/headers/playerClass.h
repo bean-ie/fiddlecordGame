@@ -10,6 +10,7 @@ struct PlayerClass {
 
     char* name;
     SDL_Texture* sprite;
+    int id;
     
     int maxHealth;
 
@@ -22,6 +23,7 @@ struct PlayerClass {
 
     float reloadTime;
     int damage;
+    float bulletLifetime;
 };
 
 typedef struct PlayerClass PlayerClass;

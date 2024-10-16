@@ -3,6 +3,7 @@
 #include "headers/textureManager.h"
 #include "headers/player.h"
 #include "headers/playerClass.h"
+#include "headers/classAbilities.h"
 
 Bullet bullets[100];
 int bulletCount = 0;
@@ -18,9 +19,10 @@ void createBullet(Vector2 spawnPosition, Vector2 direction) {
             destroyBullet(99);
         }
     Bullet bulletToSpawn;
+    bulletToSpawn.active = 1;
     bulletToSpawn.position.x = spawnPosition.x - 25;
     bulletToSpawn.position.y = spawnPosition.y - 25;
-    bulletToSpawn.lifeTime = 2;
+    bulletToSpawn.lifeTime = getPlayer()->class.bulletLifetime;
     bulletToSpawn.damage = getPlayer()->class.damage;
     bulletToSpawn.speed = randomMinMax(500, 700);
     bulletToSpawn.direction = normalizeVector(direction);
@@ -43,7 +45,21 @@ void destroyAllBullets() {
 void updateAllBullets() {
     int i;
         for (i = 0; i < bulletCount; i++) {
-            if (bullets[i].damage <= 0 || bullets[i].lifeTime <= 0) destroyBullet(i);
+            if (bullets[i].damage <= 0 || bullets[i].lifeTime <= 0) {
+                switch (getPlayer()->class.id) {
+                    default:
+                        destroyBullet(i);
+                    break;
+
+                    case 4:
+                        bullets[i].direction = normalizeVector(subtractVectors(getPlayer()->position, bullets[i].position));
+                        if (sqrMagnitude(subtractVectors(getPlayer()->position, bullets[i].position)) <= 100*100) {
+                            ryanReplenishAmmo(0);
+                            destroyBullet(i);
+                        }
+                    break;
+                }
+            }
             bullets[i].position = addVectors(bullets[i].position, multiplyVector(multiplyVector(bullets[i].direction, deltaTime), bullets[i].speed));
             bullets[i].lifeTime -= deltaTime;
         }
